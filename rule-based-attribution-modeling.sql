@@ -1,4 +1,5 @@
 WITH conversions AS 
+  #Output: All converting sessions
   ( 
     SELECT 
       user_pseudo_id, 
@@ -10,13 +11,17 @@ WITH conversions AS
     WHERE event_name = "purchase" AND _table_suffix BETWEEN "20230710" AND "20230716"
     GROUP BY 1,2
   ),
+  
   interactions AS (
     SELECT 
       user_pseudo_id, 
       (SELECT value.int_value FROM unnest(event_params) WHERE key = "ga_session_id") as ga_session_id,
-      IFNULL(max(if((SELECT value.int_value FROM unnest(event_params) WHERE key = 'entrances') = 1, session_medium, null)), "Direct") as medium,
+      session_medium as medium,
      timestamp_micros(min(event_timestamp)) as session_start_timestamp
-    FROM (SELECT *,  FIRST_VALUE(collected_traffic_source.manual_medium IGNORE NULLS) OVER(
+    FROM 
+        (SELECT *,  
+          #Grab the first non-null value of collected_traffic_source.manual_medium as the session medium
+          FIRST_VALUE(collected_traffic_source.manual_medium IGNORE NULLS) OVER(
           PARTITION BY user_pseudo_id, 
             (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') 
             ORDER BY event_timestamp ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) as session_medium   
