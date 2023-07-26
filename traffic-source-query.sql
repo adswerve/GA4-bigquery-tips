@@ -5,7 +5,6 @@ DECLARE start_date STRING DEFAULT "20230723";
 #Entrances = 1 is unreliable, sometimes it shows up, sometimes it doesn't
 #Session_start has no sessions traffic source information
 #Going with the first non-null traffic source of the session could be wrong (since it could have started as Direct)
-#I've noticed some sites performing better using IGNORE NULLS, some without
 
 #### CONFIRM ####
 #What stream and events are exported in the BigQuery Linking in Admin
