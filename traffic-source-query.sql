@@ -31,8 +31,8 @@ precedingSessions AS
 (SELECT DISTINCT user_pseudo_id, old_ga_session_id, IF(gclid is not null, "cpc", old_medium) old_medium, old_src  FROM 
     (SELECT  user_pseudo_id,  
       (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') as old_ga_session_id,  
-      first_value(collected_traffic_source.manual_medium  IGNORE NULLS)  OVER (PARTITION BY user_pseudo_id, (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') ORDER BY event_timestamp) as old_medium,
-      first_value(collected_traffic_source.manual_source  IGNORE NULLS)  OVER (PARTITION BY user_pseudo_id, (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') ORDER BY event_timestamp) as old_src,
+      first_value(collected_traffic_source.manual_medium  IGNORE NULLS)  OVER (PARTITION BY user_pseudo_id, (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') ORDER BY event_timestamp DESC) as old_medium,
+      first_value(collected_traffic_source.manual_source  IGNORE NULLS)  OVER (PARTITION BY user_pseudo_id, (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') ORDER BY event_timestamp DESC) as old_src,
       first_value(collected_traffic_source.gclid)  OVER (PARTITION BY user_pseudo_id, (SELECT value.int_value FROM unnest(event_params) WHERE key = 'ga_session_id') ORDER BY event_timestamp) as gclid
       FROM `analytics_1234.events_*` WHERE event_name NOT IN ("session_start", "first_visit") AND _table_suffix BETWEEN FORMAT_DATE("%Y%m%d", DATE_SUB(PARSE_DATE("%Y%m%d", start_date), INTERVAL 90 DAY)) AND end_date)
 ),
