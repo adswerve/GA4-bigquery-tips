@@ -1,5 +1,5 @@
-DECLARE end_date STRING DEFAULT "20230723";
 DECLARE start_date STRING DEFAULT "20230723";
+DECLARE end_date STRING DEFAULT "20230723";
 
 #### OBSERVATIONS #### 
 #Entrances = 1 is unreliable, sometimes it shows up, sometimes it doesn't
