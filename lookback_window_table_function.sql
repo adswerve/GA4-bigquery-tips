@@ -4,14 +4,14 @@ AS
 
 WITH converters as (
   SELECT user_pseudo_id, event_timestamp, ecommerce.purchase_revenue, ecommerce.transaction_id FROM `analytics_1234567.events_20231018` 
-  WHERE event_name = "purchase"),
+  WHERE event_name = conversion_event),
 
 user_pageviews as (
 SELECT user_pseudo_id, 
       event_timestamp, 
       (SELECT value.string_value FROM unnest(event_params) WHERE key = "page_location") as first_page_location
 FROM `analytics_1234567.events_202310*` 
-WHERE event_name = conversion_event)
+WHERE event_name = "page_view")
 
 
 SELECT user_pseudo_id,
