@@ -56,6 +56,77 @@ interactions AS (
       interactions
       USING (user_pseudo_id)
     WHERE interactions.session_start_timestamp <= conversions.session_start_timestamp AND interactions.session_start_timestamp > TIMESTAMP_SUB(conversions.session_start_timestamp, INTERVAL 30 DAY)
-  )
+  ),
+  
+decayAttr AS (
+SELECT interactions.medium, sum(revenue*decayShare) as revenueDecay, sum(1*decayShare) as conversionsDecay  FROM (
+  SELECT 
+    *, decayShare_PN/sum(decayShare_PN) OVER (PARTITION BY transaction_id) decayShare
+  FROM 
+  (SELECT *,
+    POW(0.5, (TIMESTAMP_DIFF(conversion_timestamp, interactions.session_start_timestamp, MINUTE)/(7*24*60))) decayShare_PN
+    FROM  base)
 
-  SELECT * FROM base
+)
+GROUP BY 1), 
+
+positionBasedAttr AS (
+
+SELECT 
+  interactions.medium, sum(revenue*positionShare) as revenuePosition, sum(1*positionShare) as conversionsPosition 
+FROM 
+ (SELECT *,
+ CASE
+    WHEN totalInteractions = 1 THEN 1
+    WHEN totalInteractions = 2 THEN 0.5
+    WHEN interactionNumber = 1 THEN 0.4
+    WHEN interactionNumber_Desc = 1 THEN 0.4
+    ELSE
+      0.2/(totalInteractions-2)
+ END as positionShare
+  FROM  base)
+
+GROUP BY 1), 
+
+linearAttr AS (
+  SELECT 
+    interactions.medium, 
+    sum(revenue/totalInteractions) as revenueLinear, 
+    sum(1/totalInteractions) as conversionsLinear
+  FROM 
+    base
+
+  GROUP BY 1
+),
+
+lastTouchAttr AS (
+
+SELECT 
+  interactions.medium, sum(revenue) as revenueLastTouch, count(distinct transaction_id) as conversionsLastTouch
+FROM base 
+WHERE interactionNumber_DESC=1
+GROUP BY 1
+),
+
+firstTouchAttr AS (
+(SELECT 
+  interactions.medium, sum(revenue) as revenueFirstTouch, count(distinct transaction_id) as conversionsFirstTouch
+FROM base 
+WHERE interactionNumber=1
+GROUP BY 1)
+)
+
+SELECT * FROM 
+  firstTouchAttr
+  JOIN 
+  lastTouchAttr
+  using(medium)
+  JOIN
+  linearAttr
+  using(medium)
+  JOIN
+  positionBasedAttr
+  using(medium)
+  JOIN
+  decayAttr
+  using(medium)
