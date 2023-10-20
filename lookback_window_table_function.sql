@@ -28,4 +28,4 @@ SELECT user_pseudo_id,
 
   -- You can now trigger the table function with the following command
   -- (14 day lookback window and conversion event = "purchase")
-  -- SELECT * FROM `twiddy-1002.analytics_311915667.ga4_lookback_window`(14, "purchase");
+  -- SELECT * FROM `analytics1234567.ga4_lookback_window`(14, "purchase");
