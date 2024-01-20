@@ -15,3 +15,9 @@ This query tries to replicate session traffic source information from the GA4 UI
 
 ### rule-based-attribution-modeling.sql
 This query includes 5 different attribution models on top of the GA4 BigQuery export taking the traffic-source-query.sql as an input.
+
+### channelGrouping.sql
+A definition of a UDF, that takes medium, source, campaign and potential additional site categorizations to provide GA4-like channel grouping. The UDF was built based on the official documentation.
+
+### channelGrouping_test.sql
+A few quick tests of the channel grouping function.
