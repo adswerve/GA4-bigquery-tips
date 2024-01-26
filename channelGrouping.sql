@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION GA4.defaultChannelGrouping(medium STRING, source STRING, campaign STRING, shoppingSitesAdd ARRAY<STRING>, searchSitesAdd ARRAY<STRING>, socialSitesAdd ARRAY<STRING>, videoSitesAdd ARRAY<STRING>)
 #Function is based on the Default channel definitions
+# If you don't want to add custom sites to the rules, just populate all *sitesAdd as null
 #https://support.google.com/analytics/answer/9756891?hl=en# based on 1/19/2024
 RETURNS STRING
 LANGUAGE js
